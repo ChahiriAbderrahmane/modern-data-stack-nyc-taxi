@@ -13,11 +13,11 @@ register_file_path = '/usr/local/airflow/dags/register_files.json'
 def detect_new_file():
 
     current_files = [file_name for file_name in os.listdir(csv_dir) if file_name.endswith('.csv')]
-
-    new_files = [f for f in current_files if f not in Variable.get("registred_files", default_var=[], deserialize_json=True)]
+    registered_files = Variable.get("registred_files", default_var=[], deserialize_json=True)
+    new_files = [f for f in current_files if f not in registered_files]
 
     if new_files:
-        all_files = current_files + new_files
+        all_files = registered_files + new_files
         Variable.set("registred_files", all_files, serialize_json=True)
         print(f"Nouveaux fichiers détectés : {new_files}")
         return new_files
@@ -42,8 +42,7 @@ def load_new_files_to_postgres(**context):
 
             # DROP + CREATE table
             cursor.execute(f"""
-                DROP TABLE IF EXISTS bronze.{table_name} CASCADE;
-                CREATE TABLE bronze.{table_name} (
+                ALTER TABLE bronze.{table_name} (
                     LocationID INTEGER,
                     Borough VarCHAR(50),
                     Zone VarCHAR(50),

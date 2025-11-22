@@ -9,7 +9,7 @@ apache-airflow-providers-common-sql==1.14.0
 # Cosmos - version plus récente
 astronomer-cosmos==1.7.1
 
-# Dépendances
+# dependencies
 protobuf>=5.0,<6.0
 opentelemetry-proto==1.28.0
 astro-run-dag

@@ -58,11 +58,12 @@ def load_csv_to_postgres(**context):
                 improvement_surcharge FLOAT,
                 total_amount FLOAT,
                 congestion_surcharge FLOAT,
-                Airport_fee FLOAT
+                Airport_fee FLOAT,
+                insertion_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """)
         
-        # COPY ultra-rapide
+        # COPY est apparament ultra-rapide
         with open(csv_path, 'r') as f:
             cursor.copy_expert(f"""
                 COPY bronze.{table_name} 
@@ -82,7 +83,7 @@ with DAG(
     start_date=datetime(2024, 1, 1),
     schedule_interval=None,
     catchup=False,
-    tags=["optimized", "bronze"]
+    tags=["bronze"]
 ) as dag:
     
     load_task = PythonOperator(

@@ -55,7 +55,7 @@ with DAG(
 
     start = EmptyOperator(task_id="start")
 
-    # Étape 1: Créer toutes les dimensions (sans tests)
+    # Étape 1: créer toutes les dimensions mais sans tests
     build_dimensions = DbtTaskGroup(
         group_id="build_dimensions",
         project_config=ProjectConfig(
@@ -67,14 +67,14 @@ with DAG(
             load_method=LoadMode.DBT_LS,
             select=["dim_vendor", "dim_datetime", "dim_location", "dim_rate_code", 
                    "dim_payment_type", "dim_store_forward", "dim_trip_category"],
-            test_behavior="none",  # Désactiver les tests pour les dimensions
+            test_behavior="none",  # sert à désactiver les tests pour les dimensions
         ),
         operator_args={
             "install_deps": True,
         },
     )
 
-    # Étape 2: Créer la table de faits (sans tests)
+    # Étape 2: c'est pour créer la table de faits sans tests
     build_facts = DbtTaskGroup(
         group_id="build_facts",
         project_config=ProjectConfig(
@@ -85,14 +85,14 @@ with DAG(
         render_config=RenderConfig(
             load_method=LoadMode.DBT_LS,
             select=["fact_taxi_trips"],
-            test_behavior="none",  # Désactiver les tests pour le moment
+            test_behavior="none",  # pour désactiver les tests pour le moment
         ),
         operator_args={
             "install_deps": False,
         },
     )
 
-    # Étape 3: Créer les aggregates (sans tests)
+    # Étape 3: créer les aggregates (sans tests) car ça m'a causé des problèmes
     build_aggregates = DbtTaskGroup(
         group_id="build_aggregates",
         project_config=ProjectConfig(
@@ -109,7 +109,7 @@ with DAG(
         },
     )
 
-    # Étape 4: Exécuter TOUS les tests après la construction complète
+    # Étape 4: finalement exécuter TOUS les tests après la construction complète, cette méthode a marché pour moi
     run_tests = DbtTaskGroup(
         group_id="run_all_tests",
         project_config=ProjectConfig(
@@ -130,5 +130,5 @@ with DAG(
     )
     end = EmptyOperator(task_id="end")
 
-    # Définir l'ordre d'exécution
+    # to define the order of execution
     start >> build_dimensions >> build_facts >> build_aggregates >> run_tests >> end

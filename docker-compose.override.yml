@@ -9,14 +9,11 @@ services:
       POSTGRES_PASSWORD: dbt_password
       POSTGRES_DB: dwh_db
     ports:
-      - "5434:5432"  # Exposé sur le port 5434 de l'hôte
+      - "5434:5432"  
     volumes:
       - postgres-dbt-data:/var/lib/postgresql/data
     networks:
       - airflow
-
-  # Le PostgreSQL pour Airflow est déjà fourni par Astro
-  # Vous n'avez pas besoin de le redéfinir
 
 volumes:
   postgres-dbt-data:
