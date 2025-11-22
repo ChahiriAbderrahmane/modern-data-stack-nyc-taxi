@@ -40,7 +40,7 @@ SELECT
     -- Surrogate key (Primary Key)
     {{ dbt_utils.generate_surrogate_key(['s.vendorid', 's.tpep_pickup_datetime', 's.tpep_dropoff_datetime', 's.pulocationid', 's.dolocationid']) }} as trip_key,
     
-    -- Foreign keys to dimensions
+    -- Foreign keys to the other dimensions
     v.vendor_key,
     dt_pickup.datetime_key as pickup_datetime_key,
     dt_dropoff.datetime_key as dropoff_datetime_key,
@@ -57,7 +57,7 @@ SELECT
     s.is_invalid_trip,
     s.rush_hour_flag,
     
-    -- Metrics (measures)
+    -- Metrics 
     s.passenger_count_that_day,
     s.passenger_count_quality,
     s.trip_duration_minutes,

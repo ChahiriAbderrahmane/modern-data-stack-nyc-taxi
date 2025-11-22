@@ -61,7 +61,7 @@ SELECT
     COUNT(CASE WHEN time_of_day = 'Evening' THEN 1 END) AS evening_trips,
     COUNT(CASE WHEN time_of_day = 'Night' THEN 1 END) AS night_trips,
     
-    -- Rush hour (booléen)
+    -- Rush hour ou bien peak (booléen)
     COUNT(CASE WHEN rush_hour_flag = 'Rush Hour' THEN 1 END) AS rush_hour_trips,
     
     -- Airport trips (booléen)

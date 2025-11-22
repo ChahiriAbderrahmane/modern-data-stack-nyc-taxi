@@ -30,10 +30,8 @@ SELECT
     dropoff_borough,
     pickup_year,
     pickup_quarter,
-    
-    -- Volume
     COUNT(*) AS total_trips,
-    
+
     -- Caractéristiques des trips
     ROUND(AVG(trip_distance)::NUMERIC, 2) AS avg_distance_miles,
     ROUND(AVG(trip_duration_minutes)::NUMERIC, 2) AS avg_duration_minutes,

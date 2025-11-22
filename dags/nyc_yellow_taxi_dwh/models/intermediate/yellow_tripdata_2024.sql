@@ -66,7 +66,6 @@ EXTRACT(HOUR FROM tpep_dropoff_datetime)  AS dropoff_hour,
 EXTRACT(MINUTE FROM tpep_dropoff_datetime)  AS dropoff_minute,
 EXTRACT(SECOND FROM tpep_dropoff_datetime)  AS dropoff_second,
 COALESCE(passenger_count, 0) as passenger_count_that_day,
--- 3. Flag de qualité (pour filtrer/analyser)
 CASE 
     WHEN passenger_count IS NULL THEN 'Missing'
     WHEN passenger_count = 0 THEN 'Invalid - Zero passengers'
@@ -125,7 +124,7 @@ CASE
     WHEN airport_fee > 0 THEN 'Pickup at LGA/JFK'
     ELSE 'Other location'
 END AS airport_pickup_flag,
--- Détection d'anomalies
+-- Détecter s'il y'a des anomalies
 CASE 
     WHEN trip_duration_minutes < 0 THEN 'Invalid - Negative duration'
     WHEN trip_duration_minutes = 0 THEN 'Invalid - Zero duration'
@@ -136,7 +135,7 @@ CASE
     WHEN total_amount < 0 THEN 'Invalid - Negative total'
     ELSE 'Valid'
 END AS data_quality_flag,
-	-- Flag pour les courses potentiellement invalides
+	-- Flag pour détecter les courses potentiellement invalides
 CASE 
     WHEN tpep_dropoff_datetime <= tpep_pickup_datetime THEN TRUE
     ELSE FALSE
