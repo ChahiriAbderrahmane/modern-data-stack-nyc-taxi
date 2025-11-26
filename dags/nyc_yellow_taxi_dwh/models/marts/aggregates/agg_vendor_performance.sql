@@ -16,15 +16,11 @@ WITH fact_with_dims AS (
         dt.month AS pickup_month,
         sf.store_and_fwd_flag,
         tc.distance_category
-    FROM {{ ref('fact_taxi_trips') }} f
-    LEFT JOIN {{ ref('dim_vendor') }} v 
-        ON f.vendor_key = v.vendor_key
-    LEFT JOIN {{ ref('dim_datetime') }} dt 
-        ON f.pickup_datetime_key = dt.datetime_key
-    LEFT JOIN {{ ref('dim_store_forward') }} sf 
-        ON f.store_forward_key = sf.store_forward_key
-    LEFT JOIN {{ ref('dim_trip_category') }} tc 
-        ON f.trip_category_key = tc.trip_category_key
+    FROM {{ ref('fact_taxi_trips_v2') }} f
+    LEFT JOIN {{ ref('dim_vendor') }} v ON f.vendor_key = v.vendor_key
+    LEFT JOIN {{ ref('dim_datetime') }} dt ON f.pickup_datetime_key = dt.datetime_key
+    LEFT JOIN {{ ref('dim_store_forward') }} sf ON f.store_forward_key = sf.store_forward_key
+    LEFT JOIN {{ ref('dim_trip_category') }} tc ON f.trip_category_key = tc.trip_category_key
 )
 
 SELECT

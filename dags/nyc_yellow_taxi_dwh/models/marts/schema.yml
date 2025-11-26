@@ -76,10 +76,10 @@ models:
           - unique
           - not_null
 
-  - name: fact_taxi_trips
+  - name: fact_taxi_trips_v2
     description: "Table de faits des courses de taxis"
     columns:
-      - name: trip_id
+      - name: trip_key
         description: "Identifiant unique de la course"
         tests:
           - unique

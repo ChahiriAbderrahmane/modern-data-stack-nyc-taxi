@@ -1,25 +1,8 @@
 version: 2
 
 sources:
-  - name: raw_data
-    description: "Données brutes concernant les courses de taxis Uber à New York City."
+  - name: bronze_data
+    description: "Raw data ingested into bronze layer."
     schema: bronze
     tables:
-      - name: yellow_tripdata_2024_01
-      - name: yellow_tripdata_2024_02
-      - name: yellow_tripdata_2024_03
-      - name: yellow_tripdata_2024_04
-      - name: yellow_tripdata_2024_05
-      - name: yellow_tripdata_2024_06
-      - name: yellow_tripdata_2024_07
-      - name: yellow_tripdata_2024_08
-      - name: yellow_tripdata_2024_09
-      - name: yellow_tripdata_2024_10
-      - name: yellow_tripdata_2024_11
-      - name: yellow_tripdata_2024_12
-      
-  - name: silver_data
-    description: "Données transformées et nettoyées concernant les courses de taxis Uber à New York City."
-    schema: silver
-    tables:
-      - name: yellow_tripdata_2024
+      - name: bronze_taxi_trips

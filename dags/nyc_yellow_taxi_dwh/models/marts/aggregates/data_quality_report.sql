@@ -7,7 +7,7 @@
 
 -- Rapport de qualité des données
 WITH all_records AS (
-    SELECT * FROM {{ source('silver_data', 'yellow_tripdata_2024') }}
+    SELECT * FROM {{ ref('nyc_tripdata_2024_v2') }}
 )
 
 SELECT

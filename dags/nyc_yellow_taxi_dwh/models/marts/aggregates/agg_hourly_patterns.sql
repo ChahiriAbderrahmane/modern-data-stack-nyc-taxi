@@ -15,7 +15,7 @@ WITH fact_with_dims AS (
         dt.year AS pickup_year,
         dt.month AS pickup_month,
         loc.borough AS pickup_borough
-    FROM {{ ref('fact_taxi_trips') }} f
+    FROM {{ ref('fact_taxi_trips_v2') }} f
     LEFT JOIN {{ ref('dim_datetime') }} dt 
         ON f.pickup_datetime_key = dt.datetime_key
     LEFT JOIN {{ ref('dim_location') }} loc 

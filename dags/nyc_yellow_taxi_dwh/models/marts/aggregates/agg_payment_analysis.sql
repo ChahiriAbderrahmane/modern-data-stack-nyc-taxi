@@ -14,13 +14,10 @@ WITH fact_with_dims AS (
         dt.year AS pickup_year,
         dt.month AS pickup_month,
         tc.fare_category
-    FROM {{ ref('fact_taxi_trips') }} f
-    LEFT JOIN {{ ref('dim_payment_type') }} pt 
-        ON f.payment_type_key = pt.payment_type_key
-    LEFT JOIN {{ ref('dim_datetime') }} dt 
-        ON f.pickup_datetime_key = dt.datetime_key
-    LEFT JOIN {{ ref('dim_trip_category') }} tc 
-        ON f.trip_category_key = tc.trip_category_key
+    FROM {{ ref('fact_taxi_trips_v2') }} f
+    LEFT JOIN {{ ref('dim_payment_type') }} pt ON f.payment_type_key = pt.payment_type_key
+    LEFT JOIN {{ ref('dim_datetime') }} dt ON f.pickup_datetime_key = dt.datetime_key
+    LEFT JOIN {{ ref('dim_trip_category') }} tc ON f.trip_category_key = tc.trip_category_key
 )
 
 SELECT

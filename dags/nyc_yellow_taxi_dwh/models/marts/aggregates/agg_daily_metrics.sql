@@ -18,7 +18,7 @@ WITH fact_with_dims AS (
         dt.time_of_day,
         v.vendorid,
         pt.payment_type
-    FROM {{ ref('fact_taxi_trips') }} f 
+    FROM {{ ref('fact_taxi_trips_v2') }} f 
     LEFT JOIN {{ ref('dim_datetime') }} dt 
         ON f.pickup_datetime_key = dt.datetime_key
     LEFT JOIN {{ ref('dim_vendor') }} v 
