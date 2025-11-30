@@ -6,7 +6,7 @@ WITH daily_data_joined AS (
         d.full_date AS pickup_date,
         d.year AS pickup_year,
         d.month AS pickup_month,
-        d.day AS pickup_day,
+        d.day_of_month AS pickup_day,
         d.day_name AS pickup_day_of_week_name,
         d.day_type, -- 'Weekend' / 'Weekday'
 

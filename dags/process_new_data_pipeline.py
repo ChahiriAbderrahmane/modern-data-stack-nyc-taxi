@@ -14,7 +14,7 @@ import os
 # for dbt configurations
 DBT_PROJECT_PATH = Path("/usr/local/airflow/dags/nyc_yellow_taxi_dwh")
 DBT_EXECUTABLE_PATH = "/usr/local/bin/dbt"
-CSV_DIR = "/usr/local/airflow/dags/nyc_yellow_taxi_dwh/seeds/second_version/taxi_trips"
+CSV_DIR = "/usr/local/airflow/dags/nyc_yellow_taxi_dwh/seeds/second_version/new_arriving_taxi_trips_data"
 
 # Profiles configuration for silver and gold layers
 profile_config_silver = ProfileConfig(
@@ -159,18 +159,6 @@ with DAG(
         operator_args={"install_deps": True},
     )
 
-    build_dimensions = DbtTaskGroup(
-        group_id="build_dimensions",
-        project_config=ProjectConfig(DBT_PROJECT_PATH),
-        profile_config=profile_config_gold,
-        execution_config=execution_config,
-        render_config=RenderConfig(
-            select=["dim_date",  "dim_location", "dim_payment_type", "dim_rate_code", "dim_time", "dim_vendor",  
-                    "dim_trip_category"],
-            test_behavior=TestBehavior.NONE),
-        operator_args={"install_deps": True},
-    )
-
     build_facts = DbtTaskGroup(
         group_id="build_facts",
         project_config=ProjectConfig(DBT_PROJECT_PATH),
@@ -207,4 +195,4 @@ with DAG(
 
 # Order of tasks exection 
 
-    start >> detect_new_file_task >> load_new_files_task >> silver_transformations_task >> build_dimensions >> build_facts >> build_aggregates >>  test_gold_task >> end 
+    start >> detect_new_file_task >> load_new_files_task >> silver_transformations_task >> build_facts >> build_aggregates >>  test_gold_task >> end 

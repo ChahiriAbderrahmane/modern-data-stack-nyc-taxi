@@ -16,8 +16,8 @@ SELECT
     EXTRACT(QUARTER FROM date_day) as quarter,
     EXTRACT(MONTH FROM date_day) as month,
     TO_CHAR(date_day, 'Month') as month_name,
-    EXTRACT(DAY FROM date_day) as day_of_month
-    EXTRACT(ISODOW FROM date_day) as day_of_week_num,
+    EXTRACT(DAY FROM date_day) as day_of_month,
+    CAST(EXTRACT(ISODOW FROM date_day) AS INT) as day_of_week_num,
     TO_CHAR(date_day, 'Day') as day_name,
     CASE WHEN EXTRACT(ISODOW FROM date_day) IN (6, 7) THEN 'Weekend' ELSE 'Weekday' END as day_type
 FROM date_spine

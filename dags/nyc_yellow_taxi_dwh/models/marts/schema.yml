@@ -31,17 +31,17 @@ models:
         tests:
           - not_null
           - dbt_utils.expression_is_true:
-              expression: "total_amount >= 0" 
+              expression: ">= 0" 
 
       - name: passenger_count
         tests:
           - dbt_utils.expression_is_true:
-              expression: "passenger_count >= 0"
+              expression: ">= 0"
 
       - name: trip_distance
         tests:
           - dbt_utils.expression_is_true:
-              expression: "trip_distance >= 0"
+              expression: ">= 0"
 
     # TESTS DE TABLE 
     tests:
@@ -63,13 +63,13 @@ models:
       - name: total_revenue_usd
         tests:
           - dbt_utils.expression_is_true:
-              expression: "total_revenue_usd >= 0"
+              expression: ">= 0"
 
       - name: avg_fare_usd
         tests:
           # Warning si le panier moyen dépasse 500$ (anomalie statistique potentielle)
           - dbt_utils.expression_is_true:
-              expression: "avg_fare_usd < 500" 
+              expression: "< 500" 
               config:
                 severity: warn # ne bloque pas l'éxécution de gad, mais donne un avertissement
 
@@ -80,7 +80,7 @@ models:
         tests:
           # Le pourcentage doit être mathématiquement valide (0-100)
           - dbt_utils.expression_is_true:
-              expression: "payment_method_share_pct >= 0 AND payment_method_share_pct <= 100"
+              expression: "BETWEEN 0 AND 100"
 
 # expression_is_true
   #C’est un test DBT qui vérifie qu’une expression SQL est vraie pour chaque ligne du modèle.

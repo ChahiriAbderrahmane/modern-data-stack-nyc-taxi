@@ -4,6 +4,17 @@
 -- Source : SILVER (car la Gold Fact Table a déjà filtré les mauvaises données)
 WITH silver_source AS (
     SELECT * FROM {{ ref('nyc_tripdata_2024_v2') }}
+),
+
+silver_source_more AS (
+    SELECT 
+        s.*,
+        p_zone.borough as pickup_borough,
+        d_zone.borough as dropoff_borough
+    FROM silver_source s
+    -- On utilise LEFT JOIN pour détecter les IDs qui ne matchent rien (NULL)
+    LEFT JOIN {{ ref('dim_location') }} p_zone ON s.pulocationid = p_zone.locationid
+    LEFT JOIN {{ ref('dim_location') }} d_zone ON s.dolocationid = d_zone.locationid
 )
 
 SELECT
@@ -44,10 +55,10 @@ SELECT
     -- Combien d'argent représentent ces lignes "sales" ?
     -- C'est l'argument n°1 pour demander du budget pour nettoyer les données sources
     ROUND(
-        SUM(CASE WHEN data_quality_flag != 'Valid' THEN total_amount ELSE 0 END)::NUMERIC
+        SUM(CASE WHEN data_quality_flag != 'Valid' THEN total_amount_usd ELSE 0 END)::NUMERIC
     , 2) AS revenue_at_risk_usd
 
-FROM silver_source
+FROM silver_source_more
 
 GROUP BY 
     pickup_date,
