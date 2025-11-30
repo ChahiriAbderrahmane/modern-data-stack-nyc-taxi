@@ -43,8 +43,6 @@ models:
         +schema: gold
         +tags: ['aggregate']  
 
-        
-
 seeds:
   nyc_yellow_taxi_dwh:
     +schema: bronze

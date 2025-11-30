@@ -1,453 +1,87 @@
 version: 2
 
 models:
-  - name: dim_vendor
-    description: "Dimension des fournisseurs de taxis"
-    columns:
-      - name: vendor_key
-        description: "Clé surrogate du fournisseur"
-        tests:
-          - unique
-          - not_null
-      - name: vendorid
-        description: "ID original du fournisseur"
-        tests:
-          - not_null
-
-  - name: dim_datetime
-    description: "Dimension temporelle pour pickup et dropoff"
-    columns:
-      - name: datetime_key
-        description: "Clé surrogate de la date/heure"
-        tests:
-          - unique
-          - not_null
-      - name: full_datetime
-        description: "Date et heure complète"
-        tests:
-          - not_null
-
-  - name: dim_location
-    description: "Dimension des localisations (pickup et dropoff)"
-    columns:
-      - name: location_key
-        description: "Clé surrogate de la localisation"
-        tests:
-          - unique
-          - not_null
-      - name: locationid
-        description: "ID original de la localisation"
-        tests:
-          - not_null
-
-  - name: dim_rate_code
-    description: "Dimension des codes tarifaires"
-    columns:
-      - name: rate_code_key
-        description: "Clé surrogate du code tarifaire"
-        tests:
-          - unique
-          - not_null
-
-  - name: dim_payment_type
-    description: "Dimension des types de paiement"
-    columns:
-      - name: payment_type_key
-        description: "Clé surrogate du type de paiement"
-        tests:
-          - unique
-          - not_null
-
-  - name: dim_store_forward
-    description: "Dimension du flag store and forward"
-    columns:
-      - name: store_forward_key
-        description: "Clé surrogate du store forward"
-        tests:
-          - unique
-          - not_null
-
-  - name: dim_trip_category
-    description: "Dimension des catégories de courses"
-    columns:
-      - name: trip_category_key
-        description: "Clé surrogate de la catégorie"
-        tests:
-          - unique
-          - not_null
-
+  # TABLE DE FAITS (GOLD)
   - name: fact_taxi_trips_v2
-    description: "Table de faits des courses de taxis"
+    description: "table de faits des trajets de taxi jaune à NYC"
     columns:
       - name: trip_key
-        description: "Identifiant unique de la course"
+        description: "Surrogate Key unique"
         tests:
           - unique
           - not_null
 
-      - name: vendor_key
-        description: "Clé étrangère vers dim_vendor"
-        tests:
-          - relationships:
-              to: ref('dim_vendor')
-              field: vendor_key
-
-      - name: pickup_datetime_key
-        description: "Clé étrangère vers dim_datetime pour pickup"
-        tests:
-          - relationships:
-              to: ref('dim_datetime')
-              field: datetime_key
-
-      - name: dropoff_datetime_key
-        description: "Clé étrangère vers dim_datetime pour dropoff"
-        tests:
-          - relationships:
-              to: ref('dim_datetime')
-              field: datetime_key
-
-      - name: pickup_location_key
-        description: "Clé étrangère vers dim_location pour pickup"
-        tests:
-          - relationships:
-              to: ref('dim_location')
-              field: location_key
-
-      - name: dropoff_location_key
-        description: "Clé étrangère vers dim_location pour dropoff"
-        tests:
-          - relationships:
-              to: ref('dim_location')
-              field: location_key
-
-      - name: total_amount_usd
-        description: "Montant total de la course en USD"
+      - name: pickup_date_id
+        description: "Clé FK vers Dim_Date"
         tests:
           - not_null
+          - relationships: 
+              to: ref('dim_date')
+              field: date_id
 
+      - name: pickup_time_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_time')
+              field: time_id
+
+      - name: total_amount
+        description: "Montant total calculé (Source of Truth)"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "total_amount >= 0" 
+
+      - name: passenger_count
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "passenger_count >= 0"
+
+      - name: trip_distance
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "trip_distance >= 0"
+
+    # TESTS DE TABLE 
+    tests:
+      # 1. Cohérence Temporelle : Dropoff doit être après Pickup
+      - dbt_utils.expression_is_true:
+          expression: "dropoff_date_id > pickup_date_id OR (dropoff_date_id = pickup_date_id AND dropoff_time_id >= pickup_time_id)"
+          name: check_dropoff_after_pickup
+
+      # 2. Cohérence Financière : Le Total doit être égal à la somme des composants
+      # On tolère une marge d'erreur de 0.02$ pour les arrondis flottants
+      - dbt_utils.expression_is_true:
+          expression: "abs(total_amount - (base_fare_usd + surcharges_usd + mta_tax_usd + tip_amount_usd + tolls_amount_usd + improvement_surcharge + congestion_surcharge + airport_fee)) <= 0.02"
+          name: check_financial_consistency
+
+  # DATA MARTS (VUES AGRÉGÉES)
   - name: agg_borough_analysis
-    description: "Agrégation des courses par borough"
+    description: "Analyse géographique par quartier"
     columns:
-      - name: pickup_borough
-        description: "Borough de prise en charge"
-        tests:
-          - not_null
-      - name: dropoff_borough
-        description: "Borough de dépose"
-        tests:
-          - not_null
-      - name: pickup_year
-        description: "Année de prise en charge"
-        tests:
-          - not_null
-      - name: pickup_quarter
-        description: "Trimestre de prise en charge"
-        tests:
-          - not_null
-      - name: total_trips
-        description: "Nombre total de courses"
-        tests:
-          - not_null
-      - name: avg_distance_miles
-        description: "Distance moyenne en miles"
-      - name: avg_duration_minutes
-        description: "Durée moyenne en minutes"
       - name: total_revenue_usd
-        description: "Revenu total en USD"
-      - name: avg_fare_usd
-        description: "Tarif moyen en USD"
-      - name: weekend_trips
-        description: "Nombre de courses le weekend"
-      - name: weekday_trips
-        description: "Nombre de courses en semaine"
-      - name: rush_hour_trips
-        description: "Nombre de courses aux heures de pointe"
-      - name: most_common_pickup_zone
-        description: "Zone de prise en charge la plus courante"
-      - name: most_common_dropoff_zone
-        description: "Zone de dépose la plus courante"
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "total_revenue_usd >= 0"
 
-  - name: agg_daily_metrics
-    description: "Agrégation des métriques quotidiennes des courses de taxis"
-    columns:
-      - name: pickup_date
-        description: "Date de prise en charge"
-        tests:
-          - unique
-          - not_null
-      - name: pickup_year
-        description: "Année de prise en charge"
-        tests:
-          - not_null
-      - name: pickup_month
-        description: "Mois de prise en charge"
-        tests:
-          - not_null
-      - name: pickup_day
-        description: "Jour du mois de prise en charge"
-        tests:
-          - not_null
-      - name: pickup_day_of_week_name
-        description: "Nom du jour de la semaine"
-        tests:
-          - not_null
-      - name: day_type
-        description: "Type de jour (Weekday/Weekend)"
-        tests:
-          - not_null
-      - name: total_trips
-        description: "Nombre total de courses"
-        tests:
-          - not_null
-      - name: active_vendors
-        description: "Nombre de fournisseurs actifs"
-      - name: total_passengers
-        description: "Nombre total de passagers"
-      - name: avg_distance_miles
-        description: "Distance moyenne en miles"
-      - name: avg_duration_minutes
-        description: "Durée moyenne en minutes"
-      - name: avg_speed_mph
-        description: "Vitesse moyenne en mph"
-      - name: total_revenue_usd
-        description: "Revenu total en USD"
       - name: avg_fare_usd
-        description: "Tarif moyen en USD"
-      - name: total_tips_usd
-        description: "Total des pourboires en USD"
-      - name: avg_tip_percentage
-        description: "Pourcentage moyen de pourboire"
-      - name: credit_card_trips
-        description: "Nombre de courses payées par carte de crédit"
-      - name: cash_trips
-        description: "Nombre de courses payées en espèces"
-      - name: morning_trips
-        description: "Nombre de courses le matin"
-      - name: afternoon_trips
-        description: "Nombre de courses l'après-midi"
-      - name: evening_trips
-        description: "Nombre de courses le soir"
-      - name: night_trips
-        description: "Nombre de courses la nuit"
-      - name: rush_hour_trips
-        description: "Nombre de courses aux heures de pointe"
-      - name: airport_trips
-        description: "Nombre de courses vers/depuis l'aéroport"
-      - name: airport_fees_collected
-        description: "Frais d'aéroport collectés"
-
-  - name: agg_hourly_patterns
-    description: "Vue agrégée des motifs horaires des courses de taxis"
-    columns:
-      - name: pickup_hour
-        description: "Heure de prise en charge (0-23)"
         tests:
-          - not_null
-      - name: time_of_day
-        description: "Période de la journée"
-        tests:
-          - not_null
-      - name: day_type
-        description: "Type de jour (Weekday/Weekend)"
-        tests:
-          - not_null
-      - name: rush_hour_flag
-        description: "Indicateur d'heure de pointe"
-        tests:
-          - not_null
-      - name: pickup_year
-        description: "Année de prise en charge"
-        tests:
-          - not_null
-      - name: pickup_month
-        description: "Mois de prise en charge"
-        tests:
-          - not_null
-      - name: total_trips
-        description: "Nombre total de courses"
-        tests:
-          - not_null
-      - name: avg_trips_per_hour
-        description: "Moyenne de courses par heure"
-      - name: avg_distance_miles
-        description: "Distance moyenne en miles"
-      - name: avg_duration_minutes
-        description: "Durée moyenne en minutes"
-      - name: avg_speed_mph
-        description: "Vitesse moyenne en mph"
-      - name: total_revenue_usd
-        description: "Revenu total en USD"
-      - name: avg_fare_usd
-        description: "Tarif moyen en USD"
-      - name: avg_fare_per_minute
-        description: "Tarif moyen par minute"
-      - name: most_common_pickup_borough
-        description: "Borough de prise en charge le plus courant"
+          # Warning si le panier moyen dépasse 500$ (anomalie statistique potentielle)
+          - dbt_utils.expression_is_true:
+              expression: "avg_fare_usd < 500" 
+              config:
+                severity: warn # ne bloque pas l'éxécution de gad, mais donne un avertissement
 
   - name: agg_payment_analysis
-    description: "Vue agrégée des analyses par type de paiement"
+    description: "Analyse des paiements et parts de marché"
     columns:
-      - name: payment_type
-        description: "Code du type de paiement"
-        tests:
-          - not_null
-      - name: payment_type_description
-        description: "Description du type de paiement"
-        tests:
-          - not_null
-      - name: pickup_year
-        description: "Année de prise en charge"
-        tests:
-          - not_null
-      - name: pickup_month
-        description: "Mois de prise en charge"
-        tests:
-          - not_null
-      - name: total_trips
-        description: "Nombre total de courses"
-        tests:
-          - not_null
       - name: payment_method_share_pct
-        description: "Part de marché du mode de paiement en pourcentage"
-      - name: total_revenue_usd
-        description: "Revenu total en USD"
-      - name: avg_fare_usd
-        description: "Tarif moyen en USD"
-      - name: total_tips_usd
-        description: "Total des pourboires en USD"
-      - name: avg_tip_usd
-        description: "Pourboire moyen en USD"
-      - name: avg_tip_percentage
-        description: "Pourcentage moyen de pourboire"
-      - name: avg_distance_miles
-        description: "Distance moyenne en miles"
-      - name: avg_duration_minutes
-        description: "Durée moyenne en minutes"
-      - name: low_fare_trips
-        description: "Nombre de courses à tarif bas"
-      - name: medium_fare_trips
-        description: "Nombre de courses à tarif moyen"
-      - name: high_fare_trips
-        description: "Nombre de courses à tarif élevé"
-      - name: very_high_fare_trips
-        description: "Nombre de courses à tarif très élevé"
+        tests:
+          # Le pourcentage doit être mathématiquement valide (0-100)
+          - dbt_utils.expression_is_true:
+              expression: "payment_method_share_pct >= 0 AND payment_method_share_pct <= 100"
 
-  - name: agg_vendor_performance
-    description: "Vue agrégée des performances des fournisseurs"
-    columns:
-      - name: vendor_key
-        description: "Clé surrogate du fournisseur"
-        tests:
-          - not_null
-          - relationships:
-              to: ref('dim_vendor')
-              field: vendor_key
-      - name: vendorid
-        description: "ID original du fournisseur"
-        tests:
-          - not_null
-      - name: vendor_name
-        description: "Nom du fournisseur"
-      - name: pickup_year
-        description: "Année de prise en charge"
-        tests:
-          - not_null
-      - name: pickup_month
-        description: "Mois de prise en charge"
-        tests:
-          - not_null
-      - name: total_trips
-        description: "Nombre total de courses"
-        tests:
-          - not_null
-      - name: market_share_pct
-        description: "Part de marché en pourcentage"
-      - name: avg_distance_miles
-        description: "Distance moyenne en miles"
-      - name: avg_duration_minutes
-        description: "Durée moyenne en minutes"
-      - name: avg_speed_mph
-        description: "Vitesse moyenne en mph"
-      - name: avg_passengers
-        description: "Nombre moyen de passagers"
-      - name: total_revenue_usd
-        description: "Revenu total en USD"
-      - name: avg_fare_usd
-        description: "Tarif moyen en USD"
-      - name: avg_fare_per_mile
-        description: "Tarif moyen par mile"
-      - name: total_tips_usd
-        description: "Total des pourboires en USD"
-      - name: avg_tip_percentage
-        description: "Pourcentage moyen de pourboire"
-      - name: store_forward_trips
-        description: "Nombre de courses en store and forward"
-      - name: store_forward_pct
-        description: "Pourcentage de courses en store and forward"
-      - name: short_trips
-        description: "Nombre de courses courtes"
-      - name: medium_trips
-        description: "Nombre de courses moyennes"
-      - name: long_trips
-        description: "Nombre de courses longues"
-      - name: very_long_trips
-        description: "Nombre de courses très longues"
-
-  - name: data_quality_report
-    description: "Rapport de qualité des données pour les courses de taxis"
-    columns:
-      - name: pickup_date
-        description: "Date de prise en charge"
-        tests:
-          - unique
-          - not_null
-      - name: pickup_year
-        description: "Année de prise en charge"
-        tests:
-          - not_null
-      - name: pickup_month
-        description: "Mois de prise en charge"
-        tests:
-          - not_null
-      - name: total_records
-        description: "Nombre total d'enregistrements"
-        tests:
-          - not_null
-      - name: valid_records
-        description: "Nombre d'enregistrements valides"
-        tests:
-          - not_null
-      - name: invalid_records
-        description: "Nombre d'enregistrements invalides"
-        tests:
-          - not_null
-      - name: valid_percentage
-        description: "Pourcentage d'enregistrements valides"
-      - name: negative_duration_count
-        description: "Nombre de durées négatives"
-      - name: zero_duration_count
-        description: "Nombre de durées nulles"
-      - name: over_24h_count
-        description: "Nombre de courses de plus de 24h"
-      - name: no_distance_count
-        description: "Nombre de courses sans distance"
-      - name: invalid_passenger_count
-        description: "Nombre de passagers invalides"
-      - name: negative_fare_count
-        description: "Nombre de tarifs négatifs"
-      - name: negative_total_count
-        description: "Nombre de montants totaux négatifs"
-      - name: missing_passenger_count
-        description: "Nombre de passagers manquants"
-      - name: zero_passengers_count
-        description: "Nombre de courses sans passagers"
-      - name: too_many_passengers_count
-        description: "Nombre de courses avec trop de passagers"
-      - name: invalid_trip_timing_count
-        description: "Nombre de courses avec timing invalide"
-      - name: missing_pickup_borough_count
-        description: "Nombre de borough de prise en charge manquants"
-      - name: missing_dropoff_borough_count
-        description: "Nombre de borough de dépose manquants"
-      - name: invalid_records_revenue_loss
-        description: "Perte de revenu due aux enregistrements invalides"
+# expression_is_true
+  #C’est un test DBT qui vérifie qu’une expression SQL est vraie pour chaque ligne du modèle.
+  #Si l’expression est FAUSSE pour au moins une ligne → le test échoue.

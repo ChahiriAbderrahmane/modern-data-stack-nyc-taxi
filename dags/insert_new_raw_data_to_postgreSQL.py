@@ -165,8 +165,8 @@ with DAG(
         profile_config=profile_config_gold,
         execution_config=execution_config,
         render_config=RenderConfig(
-            select=["dim_vendor", "dim_datetime", "dim_location", "dim_rate_code", 
-                   "dim_payment_type", "dim_store_forward", "dim_trip_category"],
+            select=["dim_date",  "dim_location", "dim_payment_type", "dim_rate_code", "dim_time", "dim_vendor",  
+                    "dim_trip_category"],
             test_behavior=TestBehavior.NONE),
         operator_args={"install_deps": True},
     )
