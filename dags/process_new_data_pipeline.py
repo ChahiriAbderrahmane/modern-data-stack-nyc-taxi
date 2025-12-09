@@ -194,5 +194,4 @@ with DAG(
     end = EmptyOperator(task_id="end")
 
 # Order of tasks exection 
-
     start >> detect_new_file_task >> load_new_files_task >> silver_transformations_task >> build_facts >> build_aggregates >>  test_gold_task >> end 

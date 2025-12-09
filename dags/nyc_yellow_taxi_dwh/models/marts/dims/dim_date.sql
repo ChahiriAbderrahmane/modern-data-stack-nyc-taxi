@@ -3,14 +3,14 @@
 WITH date_spine AS (
     {{ dbt_utils.date_spine(
         datepart="day",
-        start_date="cast('2024-01-01' as date)",
+        start_date="cast('2023-01-01' as date)",
         end_date="cast('2026-01-01' as date)"
     ) }}
 )
 SELECT
     -- Clé primaire (Format YYYYMMDD, ex: 20240101)
     CAST(TO_CHAR(date_day, 'YYYYMMDD') AS INT) as date_id,
-    date_day as full_date,
+    CAST(date_day AS DATE) as full_date,
     -- Attributs extraits
     EXTRACT(YEAR FROM date_day) as year,
     EXTRACT(QUARTER FROM date_day) as quarter,

@@ -46,3 +46,19 @@ Runtime Error
 [0m23:56:47.383023 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fafe8d34890>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fafe4852d50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fafe773a490>]}
 [0m23:56:47.386283 [debug] [MainThread]: Flushing usage events
 [0m23:56:48.031837 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m14:19:08.085782 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f163afcee90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f163affbf50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f163affa390>]}
+
+
+============================== 14:19:08.103499 | 1e34484b-60e3-4ea7-ae4e-d979da1e69eb ==============================
+[0m14:19:08.103499 [info ] [MainThread]: Running with dbt=1.10.13
+[0m14:19:08.105843 [debug] [MainThread]: running dbt with arguments {'no_print': 'None', 'profiles_dir': '/home/chahiri/.dbt', 'quiet': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'debug': 'False', 'log_format': 'default', 'version_check': 'True', 'indirect_selection': 'eager', 'send_anonymous_usage_stats': 'True', 'warn_error': 'None', 'target_path': 'None', 'introspect': 'True', 'use_experimental_parser': 'False', 'log_cache_events': 'False', 'fail_fast': 'False', 'cache_selected_only': 'False', 'use_colors': 'True', 'empty': 'False', 'invocation_command': 'dbt run --select dim_date+', 'printer_width': '80', 'log_path': 'logs', 'static_parser': 'True', 'write_json': 'True', 'partial_parse': 'True'}
+[0m14:19:08.107678 [error] [MainThread]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path /home/chahiri/repos/etl_ml_project/pr/dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m14:19:08.112343 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": false, "command_wall_clock_time": 0.1999122, "process_in_blocks": "62560", "process_kernel_time": 1.137041, "process_mem_max_rss": "100584", "process_out_blocks": "16", "process_user_time": 4.548166}
+[0m14:19:08.114333 [debug] [MainThread]: Command `dbt run` failed at 14:19:08.113916 after 0.20 seconds
+[0m14:19:08.116590 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f163f500850>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f163b140350>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f163af8fb50>]}
+[0m14:19:08.121155 [debug] [MainThread]: Flushing usage events
+[0m14:19:08.839140 [debug] [MainThread]: An error was encountered while trying to flush usage events

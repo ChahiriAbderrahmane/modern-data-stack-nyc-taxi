@@ -2,9 +2,9 @@
     materialized='incremental',
     unique_key='trip_key', 
     incremental_strategy='delete+insert',
-    indexes=[{'columns': ['trip_key']}]
+    indexes=[{'columns': ['trip_key']}] 
 ) }}
-
+-- L'index est maintenu, donc on doit garantir l'unicité avant !
 with src as (
     select * from {{ source('bronze_data', 'bronze_taxi_trips') }}
 ),
@@ -17,7 +17,7 @@ incremental_source AS (
         END as vendorid_,
         * FROM src
     {% if is_incremental() %}
-        -- On ne prend que les lignes arrivées après la dernière exécution de CE modèle
+        -- On ne prend que les lignes arrivées après la dernière exécution
         WHERE _ingestion_timestamp > (SELECT MAX(_ingestion_timestamp) FROM {{ this }})
     {% endif %}
 ),
@@ -53,7 +53,17 @@ base_data AS (
     ROUND((EXTRACT(EPOCH FROM (tpep_dropoff_datetime - tpep_pickup_datetime)) / 60),2)::FLOAT AS trip_duration_minutes,
     _source_filename,
     _ingestion_timestamp
-from incremental_source)
+from incremental_source),
+
+-- === DÉDUPLICATION ===
+deduplicated_data AS (
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY trip_key 
+            ORDER BY _ingestion_timestamp DESC -- En cas de doublon, on garde le fichier le plus récent
+        ) as row_num
+    FROM base_data
+)
 
 SELECT 
     bd.trip_key, 
@@ -99,8 +109,8 @@ SELECT
     bd.tolls_amount as tolls_amount_usd, 
     bd.improvement_surcharge,
     bd.airport_fee,
-    bd.total_amount as total_amount_usd, -- Le montant brut avant correction
-    -- CORRECTION DE LA SURCHARGE (Logic Fix 2.5$)
+    bd.total_amount as total_amount_usd, 
+    
     CASE
         WHEN bd.congestion_surcharge = 0 
              AND ROUND((bd.total_amount - (bd.fare_amount + bd.extra + bd.mta_tax + bd.tip_amount + bd.tolls_amount + bd.improvement_surcharge + bd.congestion_surcharge + bd.airport_fee))::numeric, 2) = 2.5 
@@ -108,7 +118,6 @@ SELECT
         ELSE bd.congestion_surcharge
     END AS congestion_surcharge_cleaned,
 
-    -- CALCUL DU TOTAL AMOUNT AUDITABLE (Source of Truth)
     (
         bd.fare_amount + 
         bd.extra + 
@@ -117,7 +126,6 @@ SELECT
         bd.tolls_amount + 
         bd.improvement_surcharge + 
         bd.airport_fee +
-        -- On utilise la logique de surcharge corrigée ici aussi
         CASE
             WHEN bd.congestion_surcharge = 0 
                  AND ROUND((bd.total_amount - (bd.fare_amount + bd.extra + bd.mta_tax + bd.tip_amount + bd.tolls_amount + bd.improvement_surcharge + bd.congestion_surcharge + bd.airport_fee))::numeric, 2) = 2.5 
@@ -125,11 +133,12 @@ SELECT
             ELSE bd.congestion_surcharge
         END
     ) AS total_amount_calculated, 
+
     CASE 
         WHEN bd.airport_fee > 0 THEN 'Pickup at LGA/JFK'
         ELSE 'Other location'
     END AS airport_pickup_flag,
-    -- Indicateur de qualité des données
+
     CASE 
         WHEN bd.trip_duration_minutes < 0 THEN 'Invalid - Negative duration'
         WHEN bd.trip_duration_minutes = 0 THEN 'Invalid - Zero duration'
@@ -147,7 +156,7 @@ SELECT
     CASE 
         WHEN bd.trip_duration_minutes > 0 THEN ROUND((bd.trip_distance / (bd.trip_duration_minutes / 60.0))::NUMERIC, 2)
         ELSE NULL
-    END AS avg_speed_mph, -- mile per hour
+    END AS avg_speed_mph, 
     CASE 
         WHEN bd.trip_distance > 0 THEN ROUND((bd.fare_amount / bd.trip_distance)::NUMERIC, 2)
         ELSE NULL
@@ -160,7 +169,7 @@ SELECT
         WHEN bd.fare_amount > 0 THEN ROUND((bd.tip_amount / bd.fare_amount * 100)::NUMERIC, 2)
         ELSE 0
     END AS tip_percentage,
-    -- Revenus nets (sans les taxes)
+
     (bd.fare_amount + bd.tip_amount + bd.tolls_amount) AS revenue_amount,
     CASE 
         WHEN ABS(bd.trip_distance) < 1 THEN 'Short (< 1 mile)'
@@ -184,11 +193,15 @@ SELECT
         WHEN bd.total_amount > 50 THEN 'Very High (> $50)'
         ELSE 'Invalid'
     END AS fare_category,
-    -- Dates
     DATE(bd.tpep_pickup_datetime) AS pickup_date,
     DATE(bd.tpep_dropoff_datetime) AS dropoff_date,
     bd._source_filename,
     bd._ingestion_timestamp
 
-FROM base_data bd
-WHERE EXTRACT(YEAR FROM bd.tpep_pickup_datetime) = 2024
+FROM deduplicated_data bd 
+WHERE bd.row_num = 1 -- ON NE GARDE QUE L'UNIQUE
+    AND EXTRACT(YEAR FROM bd.tpep_pickup_datetime) IN (2023, 2024)
+    AND total_amount > 0 
+    AND total_amount < 5000 
+    AND trip_distance < 1000 
+    AND passenger_count < 7
