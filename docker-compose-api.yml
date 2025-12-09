@@ -1,0 +1,22 @@
+version: '3.1'
+
+services:
+  fastapi_server:
+    build: 
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: my_fastapi_container
+    ports:
+      - "8000:8000"
+    environment:
+      # 3. Port : 5432 est le port INTERNE du conteneur DB, pas 5434 -> ailleurs
+      - DATABASE_URL=postgresql://dbt_user:dbt_password@postgres-dbt:5432/dwh_db
+    networks:
+      - shared_network
+
+# Configuration du réseau
+networks:
+  shared_network:
+    external: true
+    # ici le nom exact trouvé avec 'docker network ls'
+    name: pr_68d598_airflow
