@@ -4,7 +4,7 @@
 
   <p>
     An enterprise-grade Data Engineering project transforming raw NYC Taxi data into actionable insights 
-    via a modern stack: <strong>Airflow, dbt, PostgreSQL, FastAPI, and Power BI</strong>.
+    via a modern stack: <strong>Airflow, dbt, PostgreSQL, FastAPI, Power BI, and Slack</strong>.
   </p>
 
   <img src="https://img.shields.io/badge/Orchestration-Apache%20Airflow-blue?style=for-the-badge&logo=apacheairflow" />
@@ -12,6 +12,7 @@
   <img src="https://img.shields.io/badge/Database-PostgreSQL-336791?style=for-the-badge&logo=postgresql" />
   <img src="https://img.shields.io/badge/API-FastAPI-009688?style=for-the-badge&logo=fastapi" />
   <img src="https://img.shields.io/badge/BI-Power%20BI-F2C811?style=for-the-badge&logo=powerbi" />
+  <img src="https://img.shields.io/badge/Alerting-Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white" />
   <img src="https://img.shields.io/badge/Container-Docker-2496ED?style=for-the-badge&logo=docker" />
 </div>
 
