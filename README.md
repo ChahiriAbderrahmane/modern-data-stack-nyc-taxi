@@ -116,7 +116,7 @@ If the **Revenue at Risk** exceeds a threshold (e.g., $10k), a Slack alert is tr
 **Alerting DAG**
 ![Alerting DAG](assets/slack_dag.png)
 **Slack Alert Message**
-![Slack Alert](assets/slack_dag.png)
+![Slack Alert](assets/slack_alert_message.png)
 
 <a name="perf"></a>
 ## ⚡ Performance & Optimization
