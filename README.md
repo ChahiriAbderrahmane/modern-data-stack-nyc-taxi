@@ -96,7 +96,7 @@ Handles the end-to-end flow: `dbt run` (Bronze/Silver/Gold), `dbt test`, and dat
 ![Main DAG](assets/main_dag_graph.png)
 
 ### Static Dimensions & Utility DAGs
-Separate DAGs manage static data (Zones, Calendars) to optimize runtime.
+Separate DAGs manage static data to optimize runtime.
 
 ![static dimensions](assets/static_dimensions_dag.png)
 
