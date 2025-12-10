@@ -161,7 +161,7 @@ Optimization was a key part of the engineering process. By implementing incremen
       * **Power BI:** Open `assets/nyc_project_dashboard.pbit`
 
 
-\<div align="center"\>
-Made with ❤️ by \<a href="https://www.google.com/search?q=https://linkedin.com/in/ton-profil"\>Abderrahmane Chahiri\</a\>
-\</div\>
+<div align="center">
+Made with ❤️ by <a href="https://www.google.com/search?q=https://linkedin.com/in/ton-profil">Abderrahmane Chahiri</a>
+</div>
 
