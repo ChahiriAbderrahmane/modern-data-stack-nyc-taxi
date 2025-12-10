@@ -79,7 +79,7 @@ The final product is a comprehensive Power BI Report (`.pbip`) containing 4 spec
 *Focus: Pipeline health, Invalid records tracking, and Revenue at Risk ($).*
 ![Quality Dashboard](https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi/blob/v1.0-stable/assets/Data%20Quality%20Report%20dashboard.png)
 
-> **Feature Highlight:** Tooltips allow users to hover over data points for granular details. It works only in the first dashboard, in the line chart. 
+### **Feature Highlight:** Tooltips allow users to hover over data points for granular details. It works only in the first dashboard, in the line chart. 
 > ![Tooltip](https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi/blob/v1.0-stable/assets/Tooltip%20dashboard.png)
 
 <a name="airflow"></a>
@@ -131,6 +131,9 @@ Initially, the DAG was monolithic, rebuilding all Dimensions (Zones, Calendar) a
 | ![Before](assets/runing_duration_before.png) | ![After](assets/runing_duration_after.png) |
 | **Monolithic DAG:**<br>Rebuilding static dimensions & facts every time.<br>*(High Latency)* | **Decoupled Architecture:**<br>Static dims separated.<br>Only processing new data.<br>*(Drastic reduction in runtime)* |
 
+### **Airlfow ui dags**
+![Airlfow ui dags](assets/airflow_dags_ui_airflow.png)
+
 <a name="install"></a>
 ## 💻 How to Run
 
@@ -144,7 +147,7 @@ Initially, the DAG was monolithic, rebuilding all Dimensions (Zones, Calendar) a
 1. **Clone the repository**
    ```bash
    git clone [https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi.git)
-   cd nyc-taxi-platform ````
+   ````
 
 2. **Start the Data Platform (Airflow + Postgres)** 
     ```bash
