@@ -65,7 +65,7 @@ The "_Key Measures" table was created in powerbi to gather the measures created 
 <a name="bi"></a>
 ## 📊 Business Intelligence (Power BI)
 
-The final product is a comprehensive Power BI Report (`.pbip`) containing 4 specialized views.
+The final product is a comprehensive Power BI Report (`.pbit`) containing 4 specialized views.
 
 ### 1. Executive Pulse (C-Level)
 *Focus: Year-over-Year growth, Total Revenue, and High-level trends.*
