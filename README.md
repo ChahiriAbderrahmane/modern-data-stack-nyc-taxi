@@ -63,22 +63,22 @@ The final product is a comprehensive Power BI Report (`.pbip`) containing 4 spec
 
 ### 1. Executive Pulse (C-Level)
 *Focus: Year-over-Year growth, Total Revenue, and High-level trends.*
-![Executive Dashboard](assets/Executive Pulse dashboard.png)
+![Executive Dashboard](https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi/blob/v1.0-stable/assets/Executive%20Pulse%20dashboard.png)
 
 ### 2. Operations & Traffic (Fleet Managers)
 *Focus: Heatmaps, Borough-to-Borough flow, and RPM (Revenue Per Minute) optimization.*
-![Ops Dashboard](assets/Opérations & Trafic dashboard.png)
+![Ops Dashboard](https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi/blob/v1.0-stable/assets/Op%C3%A9rations%20%26%20Trafic%20dashboard.png)
 
 ### 3. Financial Performance (Finance Dept)
 *Focus: Payment methods adoption (Cash vs Card), Tipping behavior, and Fare buckets.*
-![Finance Dashboard](assets/Financial Performance & Spending Patterns dashboard.png)
+![Finance Dashboard](https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi/blob/v1.0-stable/assets/Financial%20Performance%20%26%20Spending%20Patterns%20dashboard.png)
 
 ### 4. Data Quality Monitor (Data Engineering Team)
 *Focus: Pipeline health, Invalid records tracking, and Revenue at Risk ($).*
-![Quality Dashboard](assets/Data Quality Report dashboard.png)
+![Quality Dashboard](https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi/blob/v1.0-stable/assets/Data%20Quality%20Report%20dashboard.png)
 
 > **Feature Highlight:** Tooltips allow users to hover over data points for granular details.
-> ![Tooltip](assets/Tooltip dashboard.png)
+> ![Tooltip](https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi/blob/v1.0-stable/assets/Tooltip%20dashboard.png)
 
 <a name="airflow"></a>
 ## 🌪️ Orchestration (Apache Airflow)
