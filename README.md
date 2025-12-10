@@ -47,14 +47,15 @@ This project simulates a real-world data platform for a Taxi company. It ingests
 The project follows the Medallion Architecture (Bronze -> Silver -> Gold).
 
 ### The Star Schema (Gold Layer)
-We transformed the data into a rigorous dimensional model optimized for BI performance.
+I transformed the data into a rigorous dimensional model optimized for BI performance.
 <div align="center">
   <img src="assets/data_star_model.png" alt="Star Schema" width="800">
   <p><em>Entity Relationship Diagram (ERD) generated from the Gold Layer.</em></p>
 </div>
 
 ### Aggregations for BI
-To handle millions of rows efficiently in Power BI, specific Data Marts were created in dbt.
+To handle millions of rows efficiently in Power BI, specific Data Marts aggregate views were created with dbt.
+The "_Key Measures" table was created in powerbi to gather the measures created with DAX code.
 <img src="assets/agg_power_bi.png" alt="Aggregation Tables" width="800">
 
 <a name="bi"></a>
@@ -67,10 +68,10 @@ The final product is a comprehensive Power BI Report (`.pbip`) containing 4 spec
 ![Executive Dashboard](https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi/blob/v1.0-stable/assets/Executive%20Pulse%20dashboard.png)
 
 ### 2. Operations & Traffic (Fleet Managers)
-*Focus: Heatmaps, Borough-to-Borough flow, and RPM (Revenue Per Minute) optimization.*
+*Focus: Filled map, Borough-to-Borough flow, and RPM (Revenue Per Minute) optimization.*
 ![Ops Dashboard](https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi/blob/v1.0-stable/assets/Op%C3%A9rations%20%26%20Trafic%20dashboard.png)
 
-### 3. Financial Performance (Finance Dept)
+### 3. Financial Performance (Finance Depatement)
 *Focus: Payment methods adoption (Cash vs Card), Tipping behavior, and Fare buckets.*
 ![Finance Dashboard](https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi/blob/v1.0-stable/assets/Financial%20Performance%20%26%20Spending%20Patterns%20dashboard.png)
 
@@ -78,7 +79,7 @@ The final product is a comprehensive Power BI Report (`.pbip`) containing 4 spec
 *Focus: Pipeline health, Invalid records tracking, and Revenue at Risk ($).*
 ![Quality Dashboard](https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi/blob/v1.0-stable/assets/Data%20Quality%20Report%20dashboard.png)
 
-> **Feature Highlight:** Tooltips allow users to hover over data points for granular details.
+> **Feature Highlight:** Tooltips allow users to hover over data points for granular details. It works only in the first dashboard, in the line chart. 
 > ![Tooltip](https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi/blob/v1.0-stable/assets/Tooltip%20dashboard.png)
 
 <a name="airflow"></a>
@@ -87,15 +88,13 @@ The final product is a comprehensive Power BI Report (`.pbip`) containing 4 spec
 The entire pipeline is orchestrated via **Astro CLI** (Airflow).
 
 ### The Main Pipeline
-Handles the end-to-end flow: `dbt run` (Silver/Gold), `dbt test`, and data freshness checks.
+Handles the end-to-end flow: `dbt run` (Bronze/Silver/Gold), `dbt test`, and data freshness checks.
 ![Main DAG](assets/main_dag_graph.png)
 
 ### Static Dimensions & Utility DAGs
 Separate DAGs manage static data (Zones, Calendars) to optimize runtime.
-<div align="center">
-  <img src="assets/static_dimensions_dag.png" width="45%">
-  <img src="assets/airflow_dags_ui_airflow.png" width="45%">
-</div>
+
+![static dimensions](assets/static_dimensions_dag.png)
 
 <a name="api"></a>
 ## 🚀 Data Products: FastAPI Microservice
@@ -111,23 +110,26 @@ The API runs in an isolated Docker container but communicates with the same Data
 <a name="quality"></a>
 ## 🚨 Observability & Alerting
 
-We implemented a **Reverse ETL** logic to proactively notify the team when Data Quality degrades.
+I implemented a **Reverse ETL** logic to proactively notify the team when Data Quality degrades.
 If the **Revenue at Risk** exceeds a threshold (e.g., $10k), a Slack alert is triggered automatically.
 
-<div align="center">
-  <img src="assets/slack_dag.png" alt="Alerting DAG" width="400">
-  <img src="assets/slack_alert_message.png" alt="Slack Alert" width="400">
-</div>
+**Alerting DAG**
+![Alerting DAG](assets/slack_dag.png)
+**Slack Alert Message**
+![Slack Alert](assets/slack_dag.png)
 
 <a name="perf"></a>
 ## ⚡ Performance & Optimization
 
-Optimization was a key part of the engineering process. By implementing incremental materialization and optimized joins in dbt:
+I optimized the pipeline architecture by **decoupling static data processing** from the daily workflow.
+
+Initially, the DAG was monolithic, rebuilding all Dimensions (Zones, Calendar) and Facts on every run.
+**Strategy:** I extracted static dimensions into a separate DAG (`static_dimensions_dag`) that runs only on-demand, leaving the main pipeline to process only new incoming trip data.
 
 | Before Optimization | After Optimization |
 | :---: | :---: |
 | ![Before](assets/runing_duration_before.png) | ![After](assets/runing_duration_after.png) |
-| *Long running times & full refreshes* | *Drastic reduction in execution time* |
+| **Monolithic DAG:**<br>Rebuilding static dimensions & facts every time.<br>*(High Latency)* | **Decoupled Architecture:**<br>Static dims separated.<br>Only processing new data.<br>*(Drastic reduction in runtime)* |
 
 <a name="install"></a>
 ## 💻 How to Run
@@ -141,7 +143,7 @@ Optimization was a key part of the engineering process. By implementing incremen
 
 1. **Clone the repository**
    ```bash
-   git clone [https://github.com/your-username/nyc-taxi-platform.git](https://github.com/your-username/nyc-taxi-platform.git)
+   git clone [https://github.com/ChahiriAbderrahmane/modern-data-stack-nyc-taxi.git)
    cd nyc-taxi-platform ````
 
 2. **Start the Data Platform (Airflow + Postgres)** 
