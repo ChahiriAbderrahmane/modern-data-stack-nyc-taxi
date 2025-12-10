@@ -26,6 +26,7 @@
 6. [Observability & Alerting](#quality)
 7. [Performance & Optimization](#perf)
 8. [Installation](#install)
+9. [ Contact ](#contact)
 
 <hr>
 
@@ -160,6 +161,12 @@ Optimization was a key part of the engineering process. By implementing incremen
       * **FastAPI Docs:** `http://localhost:8000/docs`
       * **Power BI:** Open `assets/nyc_project_dashboard.pbit`
 
+
+<a name="contact"></a>
+## 📨 Contact Me
+
+[LinkedIn](https://www.linkedin.com/in/abderrahmane-chahiri-151b26237/) •
+[Gmail](mailto:chahiri.abderrahmane.eng@gmail.com)
 
 <div align="center">
 Made with ❤️ by <a href="https://www.google.com/search?q=https://linkedin.com/in/ton-profil">Abderrahmane Chahiri</a>
