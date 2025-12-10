@@ -15,6 +15,9 @@
   <img src="https://img.shields.io/badge/Container-Docker-2496ED?style=for-the-badge&logo=docker" />
 </div>
 
+**Project Architecture**
+![Project Architecture](assets/NYC%20Taxi%20Data%20Engineering%20Plateform.png)
+
 <br>
 
 ## 📝 Table of Contents
