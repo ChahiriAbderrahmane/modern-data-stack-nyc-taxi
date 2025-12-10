@@ -123,7 +123,7 @@ If the **Revenue at Risk** exceeds a threshold (e.g., $10k), a Slack alert is tr
 
 I optimized the pipeline architecture by **decoupling static data processing** from the daily workflow.
 
-Initially, the DAG was monolithic, rebuilding all Dimensions (Zones, Calendar) and Facts on every run.
+Initially, the DAG was monolithic, rebuilding all Dimensions and Facts on every run.
 **Strategy:** I extracted static dimensions into a separate DAG (`static_dimensions_dag`) that runs only on-demand, leaving the main pipeline to process only new incoming trip data.
 
 | Before Optimization | After Optimization |
