@@ -178,6 +178,6 @@ Initially, the DAG was monolithic, rebuilding all Dimensions and Facts on every 
 [Gmail](mailto:chahiri.abderrahmane.eng@gmail.com)
 
 <div align="center">
-Made with ❤️ by <a href="https://www.google.com/search?q=https://linkedin.com/in/ton-profil">Abderrahmane Chahiri</a>
+Made with ❤️ by <a href="https://www.linkedin.com/in/chahiri-abderrahmane/">Abderrahmane Chahiri</a>
 </div>
 
